@@ -1,4 +1,4 @@
-# DuoMotion AI
+# Kubang AI
 
 Studio awal untuk menyiapkan video musik duet dari MP3 dan dua gambar karakter.
 
