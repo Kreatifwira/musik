@@ -11,9 +11,9 @@
 <div class="field"><label>2. Gambar penyanyi <span class="hint">· pilih salah satu</span></label><select id="singerType" class="select" style="margin-bottom:10px"><option value="male">Penyanyi pria</option><option value="female">Penyanyi wanita</option><option value="duet">Duet (pria &amp; wanita)</option></select><div id="singleSinger"><label class="drop" for="singerImage"><span class="ico" id="singerIcon">♂</span><span><strong id="singerLabel">Pilih gambar penyanyi pria</strong><small>Unggah satu gambar karakter penyanyi</small><span id="singerName" class="file"></span></span><input id="singerImage" type="file" accept="image/*"></label><img id="singerPreview" class="preview" alt="Pratinjau penyanyi"></div><div id="duetSingers" class="two" style="display:none"><div><label class="drop" for="maleImage"><span class="ico">♂</span><span><strong>Penyanyi pria</strong><small>Unggah gambar pria</small><span id="maleName" class="file"></span></span><input id="maleImage" type="file" accept="image/*"></label><img id="malePreview" class="preview" alt="Pratinjau pria"></div><div><label class="drop" for="femaleImage"><span class="ico">♀</span><span><strong>Penyanyi wanita</strong><small>Unggah gambar wanita</small><span id="femaleName" class="file"></span></span><input id="femaleImage" type="file" accept="image/*"></label><img id="femalePreview" class="preview" alt="Pratinjau wanita"></div></div>
 <div class="field"><label for="dance">3. Gaya gerakan</label><select id="dance" class="select"><option value="pop">Pop stage performance</option><option value="romantic">Romantic duet</option><option value="energetic">Energetic dance</option><option value="slow">Slow dance</option></select></div>
 <div class="field"><label for="ratio">4. Format video</label><select id="ratio" class="select"><option>Landscape 16:9 — YouTube</option><option>Portrait 9:16 — Shorts / Reels</option><option>Square 1:1</option></select></div>
-<div class="note">Versi awal ini hanya menyiapkan dan memeriksa bahan di browser. Mesin AI, penyimpanan cloud, dan rendering MP4 belum dihubungkan. Tidak ada API berbayar yang dipanggil.</div>
+<div class="note">File MP3 dan gambar akan disimpan secara privat di akun Anda. Fitur pembuatan video AI dan rendering MP4 belum diaktifkan; tidak ada API AI berbayar yang dipanggil.</div>
 <div class="actions"><button class="btn primary" id="prepare">Periksa bahan proyek</button><button class="btn secondary" id="reset" type="button">Reset</button></div><p id="message" class="sub" role="status" aria-live="polite" style="margin:12px 0 0"></p></section>
-<aside class="panel"><h2>Alur produksi</h2><p class="sub">Target video musik berdurasi penuh.</p><div class="steps"><div class="step"><div class="num">1</div><div><b>Upload bahan</b><span>MP3 dan gambar sesuai pilihan penyanyi</span></div></div><div class="step"><div class="num">2</div><div><b>Analisis lagu</b><span>Durasi, tempo dan pembagian vokal</span></div></div><div class="step"><div class="num">3</div><div><b>Animasi karakter</b><span>Lip-sync, ekspresi, dance dan gerakan badan</span></div></div><div class="step"><div class="num">4</div><div><b>Rakit video</b><span>Susun klip, sinkronkan audio, render MP4</span></div></div></div><div class="status">Status sistem: <strong>Antarmuka tahap awal</strong><br>Login, penyimpanan, antrean AI dan rendering menyusul.</div></aside></div><footer>Kubang AI · Studio video musik · 2026</footer></main>
+<aside class="panel"><h2>Alur produksi</h2><p class="sub">Target video musik berdurasi penuh.</p><div class="steps"><div class="step"><div class="num">1</div><div><b>Upload bahan</b><span>MP3 dan gambar sesuai pilihan penyanyi</span></div></div><div class="step"><div class="num">2</div><div><b>Analisis lagu</b><span>Durasi, tempo dan pembagian vokal</span></div></div><div class="step"><div class="num">3</div><div><b>Animasi karakter</b><span>Lip-sync, ekspresi, dance dan gerakan badan</span></div></div><div class="step"><div class="num">4</div><div><b>Rakit video</b><span>Susun klip, sinkronkan audio, render MP4</span></div></div></div><div class="status">Status sistem: <strong>Akun dan penyimpanan proyek aktif</strong><br>Mesin AI, antrean produksi, dan rendering MP4 belum diaktifkan.</div></aside></div><footer>Kubang AI · Studio video musik · 2026</footer></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL="https://tjgsammafqrxvqagfuyz.supabase.co";
@@ -32,6 +32,43 @@ function bind(id,name,preview,audio=false){$(id).addEventListener('change',e=>{c
 bind('audio','audioName',null,true);bind('singerImage','singerName','singerPreview');bind('maleImage','maleName','malePreview');bind('femaleImage','femaleName','femalePreview');
 function updateSingerMode(){const mode=$('singerType').value;const duet=mode==='duet';$('singleSinger').style.display=duet?'none':'block';$('duetSingers').style.display=duet?'grid':'none';$('singerIcon').textContent=mode==='male'?'♂':'♀';$('singerLabel').textContent='Pilih gambar penyanyi '+(mode==='male'?'pria':'wanita')}
 $('singerType').addEventListener('change',updateSingerMode);
-$('prepare').onclick=()=>{const a=$('audio').files[0],mode=$('singerType').value;const images=mode==='duet'?[$('maleImage').files[0],$('femaleImage').files[0]]:[$('singerImage').files[0]];if(!a||images.some(x=>!x)){$('message').textContent=mode==='duet'?'Lengkapi MP3 serta gambar penyanyi pria dan wanita.':'Lengkapi file MP3 dan pilih satu gambar penyanyi.';return}if(!a.type.startsWith('audio/')||images.some(x=>!x.type.startsWith('image/'))){$('message').textContent='Pastikan file audio dan semua gambar memiliki format yang benar.';return}$('message').textContent='Bahan lengkap di browser. Tahap berikutnya: hubungkan Supabase agar proyek tersimpan dengan aman.'};
+const STORAGE_BUCKET='duomotion-assets';
+const MAX_FILE_BYTES=100*1024*1024;
+const allowedAudio=['audio/mpeg','audio/mp3','audio/wav','audio/x-wav'];
+const allowedImages=['image/jpeg','image/png','image/webp'];
+function safeExtension(file,fallback){const raw=(file.name.split('.').pop()||fallback).toLowerCase();return /^[a-z0-9]{1,8}$/.test(raw)?raw:fallback}
+async function uploadProjectFile(userId,projectId,kind,file){const ext=safeExtension(file,kind==='audio'?'mp3':'jpg');const path= userId+'/'+projectId+'/'+kind+'.'+ext;const {data,error}=await supabaseClient.storage.from(STORAGE_BUCKET).upload(path,file,{contentType:file.type,upsert:false});if(error)throw error;return data.path}
+$('prepare').onclick=async()=>{
+  const a=$('audio').files[0],mode=$('singerType').value;
+  const male=mode==='duet'?$('maleImage').files[0]:(mode==='male' ? $('singerImage').files[0] : null);
+  const female=mode==='duet'?$('femaleImage').files[0]:(mode==='female' ? $('singerImage').files[0] : null);
+  const images=[male,female].filter(Boolean);
+  if(!a||!images.length||(mode==='duet'&&images.length!==2)){$('message').textContent=mode==='duet'?'Lengkapi MP3 serta gambar penyanyi pria dan wanita.':'Lengkapi file MP3 dan pilih satu gambar penyanyi.';return}
+  if(!allowedAudio.includes(a.type)||images.some(x=>!allowedImages.includes(x.type))){$('message').textContent='Format belum didukung. Gunakan MP3/WAV untuk audio dan JPG/PNG/WEBP untuk gambar.';return}
+  if([a,...images].some(x=>x.size>MAX_FILE_BYTES)){$('message').textContent='Setiap file harus berukuran maksimal 100 MB.';return}
+  const {data:userData,error:userError}=await supabaseClient.auth.getUser();
+  if(userError||!userData?.user){$('message').textContent='Silakan masuk ke akun Kubang AI terlebih dahulu.';return}
+  const user=userData.user,projectId=crypto.randomUUID(),uploaded=[];
+  const button=$('prepare');button.disabled=true;button.textContent='Menyimpan...';
+  $('message').textContent='Sedang mengunggah MP3 dan gambar ke penyimpanan privat...';
+  try{
+    const audioPath=await uploadProjectFile(user.id,projectId,'audio',a);uploaded.push(audioPath);
+    let malePath=null,femalePath=null;
+    if(male){malePath=await uploadProjectFile(user.id,projectId,'male',male);uploaded.push(malePath)}
+    if(female){femalePath=await uploadProjectFile(user.id,projectId,'female',female);uploaded.push(femalePath)}
+    const danceMap={pop:'pop_stage',romantic:'romantic_duet',energetic:'energetic_dance',slow:'slow_dance'};
+    const ratioValue=$('ratio').value.startsWith('Portrait')?'9:16':$('ratio').value.startsWith('Square')?'1:1':'16:9';
+    const title=a.name.replace(/\.[^.]+$/,'').slice(0,120)||'Proyek video baru';
+    const {error:insertError}=await supabaseClient.from('video_projects').insert({
+      id:projectId,user_id:user.id,title,audio_path:audioPath,male_image_path:malePath,female_image_path:femalePath,
+      dance_style:danceMap[$('dance').value],aspect_ratio:ratioValue,status:'draft'
+    });
+    if(insertError)throw insertError;
+    $('message').textContent='Berhasil! MP3, gambar, dan data proyek sudah tersimpan di akun Anda. Status proyek: Draft. Video AI belum dibuat.';
+  }catch(error){
+    if(uploaded.length){await supabaseClient.storage.from(STORAGE_BUCKET).remove(uploaded).catch(()=>{})}
+    $('message').textContent='Penyimpanan gagal: '+(error.message||'Terjadi kesalahan. Periksa koneksi dan coba lagi.');
+  }finally{button.disabled=false;button.textContent='Periksa bahan proyek'}
+};
 $('reset').onclick=()=>{['audio','singerImage','maleImage','femaleImage'].forEach(id=>$(id).value='');['audioName','singerName','maleName','femaleName','message'].forEach(id=>$(id).textContent='');['singerPreview','malePreview','femalePreview','audioPreview'].forEach(id=>{const p=$(id);p.removeAttribute('src');p.style.display='none'});$('singerType').value='male';updateSingerMode()};
 </script></body></html>
